@@ -19,6 +19,7 @@ module.exports = function( options ){
   var plugin = "mail"
 
   options = this.util.deepextend({
+    enabled:   true,
     folder:    './email-templates',
     content:   {},
     mail:      {},
@@ -75,11 +76,14 @@ module.exports = function( options ){
 
 
   seneca.add({role:plugin,hook:'send'},function( args, done ){
-
-    transport.sendMail(args, function(err, response){
-      if( err ) return done(err);
-      done(null,{ok:true,details:response})
-    })
+    if (options.enabled === true) {
+      transport.sendMail(args, function(err, response){
+        if( err ) return done(err);
+        done(null,{ok:true,details:response})
+      })
+    } else {
+      done(null);
+    }
   })
 
 
