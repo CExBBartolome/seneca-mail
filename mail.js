@@ -77,6 +77,19 @@ module.exports = function( options ){
 
   seneca.add({role:plugin,hook:'send'},function( args, done ){
     if (options.enabled === true) {
+      // Overwrite recipients if overwriteEmail is used
+      if (options.overwriteEmail) {
+        var prepend = '-------------------- Overwriting Recipients --------------------';
+        prepend += 'To: ' + args.to + '<br />';
+        prepend += 'Cc: ' + args.cc + '<br />';
+        prepend += 'Bcc: ' + args.bcc + '<br />';
+        prepend += '----------------------------------------------------------------<br /><br />';
+        args.to = null;
+        args.cc = null;
+        args.bcc = null;
+        args.html = prepend + args.html;
+      }
+      // Send the mail
       transport.sendMail(args, function(err, response){
         if( err ) return done(err);
         done(null,{ok:true,details:response})
