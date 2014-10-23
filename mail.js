@@ -80,9 +80,9 @@ module.exports = function( options ){
       // Overwrite recipients if overwriteEmail is used
       if (options.overwriteEmail) {
         var prepend = '-------------------- Overwriting Recipients --------------------<br />';
-        prepend += 'To: ' + (_.isArray(args.to) ? args.to.join(', ') : args.to) + '<br />';
-        prepend += 'Cc: ' + (_.isArray(args.cc) ? args.cc.join(', ') : args.cc) + '<br />';
-        prepend += 'Bcc: ' + (_.isArray(args.bcc) ? args.bcc.join(', ') : args.bcc) + '<br />';
+        prepend += 'To: ' + (_.isArray(args.to) ? args.to.join(', ') : args.to || '') + '<br />';
+        prepend += 'Cc: ' + (_.isArray(args.cc) ? args.cc.join(', ') : args.cc || '') + '<br />';
+        prepend += 'Bcc: ' + (_.isArray(args.bcc) ? args.bcc.join(', ') : args.bcc || '') + '<br />';
         prepend += '----------------------------------------------------------------<br /><br />';
         args.to = options.overwriteEmail;
         args.cc = null;
