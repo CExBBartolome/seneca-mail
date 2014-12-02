@@ -7,14 +7,7 @@ var fs = require('fs')
 var _              = require('underscore')
 var emailtemplates = require('email-templates')
 var nodemailer     = require("nodemailer")
-var transports = {
-  'smtp'    : 'nodemailer-smtp-transport',
-  'ses'     : 'nodemailer-ses-transport',
-  'smtpPool': 'nodemailer-smtp-pool',
-  'sendmail': 'nodemailer-sendmail-transport',
-  'stub'    : 'nodemailer-stub-transport',
-  'pickup'  : 'nodemailer-pickup-transport'
-};
+
 
 
 
@@ -146,15 +139,8 @@ module.exports = function( options ){
 
 
   function initTransport(options, callback) {
-    var transportPluginName = transports[options.transport] ||
-      options.transportPluginName || options.transport;
-
-    seneca.log.debug('Loading specified transport definition: ' + transportPluginName);
-    var transportPlugin = require(transportPluginName);
-
-
-    transport = nodemailer.createTransport(transportPlugin(options.config));
-    callback(null,transport);
+    transport = nodemailer.createTransport( options.transport, options.config )
+    callback(null,transport)
   }
 
   seneca.add({role:plugin,hook:'init',sub:'transport'},function( args, done ){
