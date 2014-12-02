@@ -146,14 +146,11 @@ module.exports = function( options ){
 
 
   function initTransport(options, callback) {
-    var transportPluginName = transports[options.transport] ||
-      options.transportPluginName || options.transport;
-
-    seneca.log.debug('Loading specified transport definition: ' + transportPluginName);
-    var transportPlugin = require(transportPluginName);
-
-
-    transport = nodemailer.createTransport(transportPlugin(options.config));
+    if (options.transport) {
+      transport = require(transports[options.transport])(options.config);
+    } else {
+      transport = nodemailer.createTransport();
+    }
     callback(null,transport);
   }
 
