@@ -7,7 +7,7 @@ var fs = require('fs')
 var _              = require('underscore')
 var emailtemplates = require('email-templates')
 var nodemailer     = require("nodemailer")
-
+var smtpTransport  = require('nodemailer-smtp-transport')
 
 
 
@@ -139,8 +139,12 @@ module.exports = function( options ){
 
 
   function initTransport(options, callback) {
-    transport = nodemailer.createTransport( options.transport, options.config )
-    callback(null,transport)
+    if (options.transport === 'SMTP' || options.transport === 'smtp') {
+      transport = nodemailer.createTransport(smtpTransport(options.config));
+    } else {
+      transport = nodemailer.createTransport();
+    }
+    callback(null,transport);
   }
 
   seneca.add({role:plugin,hook:'init',sub:'transport'},function( args, done ){
