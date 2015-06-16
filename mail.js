@@ -30,7 +30,7 @@ module.exports = function( options ){
 
 
 
-  seneca.add({role:plugin,cmd:'generate'},function( args, done ){
+  function generate( args, done ){
     var code     = args.code // template identifier
 
     this.act({role:plugin,hook:'content',
@@ -42,10 +42,10 @@ module.exports = function( options ){
         done( err, {ok:!err, html:html, text:text} )
       })
     })
-  })
+  }
 
 
-  seneca.add({role:plugin,cmd:'send'},function( args, done ){
+  function send( args, done) {
     var seneca = this
 
     if( args.code ) {
@@ -63,19 +63,19 @@ module.exports = function( options ){
       seneca.log.debug('send',sendargs.code||'-',sendargs.to)
       seneca.act(sendargs,done)
     }
-  })
+  }
 
 
-  seneca.add({role:plugin,hook:'content'},function( args, done ){
+  function content( args, done ){
     var code   = args.code // template identifier
 
     var content = this.util.deepextend({},options.content[code]||{},args.content||{})
     done( null, content )
-  })
+  }
 
 
 
-  seneca.add({role:plugin,hook:'send'},function( args, done ){
+  function sendHook( args, done ){
     if (options.enabled === true) {
       // Overwrite recipients if overwriteEmail is used
       if (options.overwriteEmail) {
@@ -97,7 +97,7 @@ module.exports = function( options ){
     } else {
       done(null);
     }
-  })
+  }
 
 
 
@@ -133,9 +133,9 @@ module.exports = function( options ){
     })
   }
 
-  seneca.add({role:plugin,hook:'init',sub:'templates'},function( args, done ) {
+  function hookInitTemplates( args, done ){
     initTemplates(this, args.options, done)
-  })
+  }
 
 
   function initTransport(options, callback) {
@@ -147,13 +147,21 @@ module.exports = function( options ){
     callback(null,transport);
   }
 
-  seneca.add({role:plugin,hook:'init',sub:'transport'},function( args, done ){
+  function hookInitTransport( args, done ){
     initTransport(args.options, done)
-  })
+  }
 
 
   seneca.add({init:plugin},function( args, done ){
     var seneca = this
+
+    seneca.add({role:plugin,cmd:'generate'}, generate);
+    seneca.add({role:plugin,cmd:'send'}, send);
+    seneca.add({role:plugin,hook:'content'}, content);
+    seneca.add({role:plugin,hook:'send'}, sendHook);
+    seneca.add({role:plugin,hook:'init',sub:'templates'}, hookInitTemplates);
+    seneca.add({role:plugin,hook:'init',sub:'transport'}, hookInitTransport);
+
     seneca.act(
       {role:plugin,hook:'init',sub:'templates',options:options},
       function( err ){
